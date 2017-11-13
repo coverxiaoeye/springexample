@@ -1,0 +1,66 @@
+getdirname_use_debuginfo.lua
+function dirname(str)
+	if str:match(".-/.-") then
+		local name = string.gsub(str, "(.*/)(.+)", "%1")
+		return name
+	elseif str:match(".-\\.-") then
+		local name = string.gsub(str, "(.*\\)(.+)", "%1")
+		return name
+	else
+		return ''
+	end
+end
+
+--- 当前文件名
+local _FILE_ = debug.getinfo(1,'S').source:sub(2)
+print(dirname(_FILE_))
+
+
+show_allfiles_use_lfs.lua
+require"lfs" --载入lfs 
+print (lfs._VERSION) --看看成功没有
+
+print(lfs.currentdir())
+----------------------------------------------------------------------------------
+--It will return a table that contents all the file paths in the rootpath
+function getpathes(rootpath, pathes)
+    pathes = pathes or {}
+    for entry in lfs.dir(rootpath) do
+        if entry ~= '.' and entry ~= '..' then
+            local path = rootpath .. '\\' .. entry
+            local attr = lfs.attributes(path)
+            assert(type(attr) == 'table')
+            
+            if attr.mode == 'directory' then
+                getpathes(path, pathes)
+            else
+                table.insert(pathes, path)
+            end
+        end
+    end
+    return pathes
+end
+function dirname(str)
+	if str:match(".-/.-") then
+		local name = string.gsub(str, "(.*)/(.+)", "%1")
+		return name
+	elseif str:match(".-\\.-") then
+		local name = string.gsub(str, "(.*)\\(.+)", "%1")
+		return name
+	else
+		return ''
+	end
+end
+--[[
+local paths = getpathes(".")
+for _,name in ipairs(paths) do
+	print(name)
+end
+]]
+
+--- 当前文件名
+local _FILE_ = debug.getinfo(1,'S').source:sub(2)
+local paths = getpathes(dirname(_FILE_))
+for _,name in ipairs(paths) do
+	print(name)
+end
