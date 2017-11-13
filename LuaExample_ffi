@@ -1,0 +1,111 @@
+ffitest codeblockProj
+main.h
+#ifndef __MAIN_H__
+#define __MAIN_H__
+
+#include <windows.h>
+
+/*  To use this exported function of dll, include this header
+ *  in your project.
+ */
+
+#ifdef BUILD_DLL
+    #define DLL_EXPORT __declspec(dllexport)
+#else
+    #define DLL_EXPORT __declspec(dllimport)
+#endif
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+void DLL_EXPORT SomeFunction(const LPCSTR sometext);
+
+void DLL_EXPORT showMSBBox(const char str[]);
+
+int DLL_EXPORT ffi_math_add(int op1,int op2);
+
+int DLL_EXPORT ffi_math_sub(int op1,int op2);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // __MAIN_H__
+
+main.cpp
+#include "main.h"
+
+// a sample exported function
+void DLL_EXPORT SomeFunction(const LPCSTR sometext)
+{
+    MessageBoxA(0, sometext, "DLL Message", MB_OK | MB_ICONINFORMATION);
+}
+
+void DLL_EXPORT showMSBBox(const char str[])
+{
+    MessageBoxA(0, str, "DLL Message", MB_OK | MB_ICONINFORMATION);
+}
+int DLL_EXPORT ffi_math_add(int op1,int op2)
+{
+    return op1+op2;
+}
+
+int DLL_EXPORT ffi_math_sub(int op1,int op2)
+{
+    return op1-op2;
+}
+
+extern "C" DLL_EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+    switch (fdwReason)
+    {
+        case DLL_PROCESS_ATTACH:
+            // attach to process
+            // return FALSE to fail DLL load
+            break;
+
+        case DLL_PROCESS_DETACH:
+            // detach from process
+            break;
+
+        case DLL_THREAD_ATTACH:
+            // attach to thread
+            break;
+
+        case DLL_THREAD_DETACH:
+            // detach from thread
+            break;
+    }
+    return TRUE; // succesful
+}
+
+ffidemo.lua
+local ffi = require("ffi")
+ffi.cdef[[
+typedef char TCHAR;
+typedef TCHAR *LPTSTR;
+typedef const TCHAR *LPCTSTR;
+typedef LPCTSTR LPCSTR;
+
+void SomeFunction(const LPCSTR sometext);
+
+void showMSBBox(const char str[]);
+
+int ffi_math_add(int op1,int op2);
+
+int ffi_math_sub(int op1,int op2);
+]]
+local ffitest = ffi.load(ffi.os == "Windows" and "ffitest" or "z")
+
+ffitest.SomeFunction("HELLO,BOYS!")
+
+local result = ffitest.ffi_math_add(5,3)
+print("ffi_math_add(5,3)="..result)
+
+local subresult = ffitest.ffi_math_sub(5,3)
+print("ffi_math_sub(5,3)="..subresult)
+
+ffitest.showMSBBox("Hello")
