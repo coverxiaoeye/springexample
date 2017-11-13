@@ -31,3 +31,10 @@ else
 	print(res)
 end
 
+
+unpacktest.lua
+arrayData = {"a", "b", "c", "d", "e"};  
+print(arrayData); -- print the address of the arrayData  
+print(unpack(arrayData)); -- print all the elements of the arrayData  
+print(unpack(arrayData, 2)); --the second param is the index of the arrayData  
+
