@@ -1,0 +1,33 @@
+pcalltest.lua
+--Lua中的异常处理pcall、xpcall、debug使用实例 http://www.jb51.net/article/55522.htm
+local status,res = pcall(function(i) print(i) end, 33)
+print(status)
+print(res)
+print("---------------------")
+local status2,res2 = pcall(function(i) print(i) error('error..') end, 33)
+print(status2)
+print(res2)
+print("---------------------")
+local status3,res3 = xpcall(function(i) print(i) error('error..') end, function() print(debug.traceback()) end, 33)
+print(status3)
+print(res3)
+print("---------------------")
+local n = io.read()
+assert(tonumber(n),"invalid input:"..n.." is not a number")
+
+bittest.lua
+local bit = require("bit")
+local function printx(x)
+  print("0x"..bit.tohex(x))
+end
+printx(bit.band(0x12345678, 0xff))
+
+print(bit.band(2,1))
+
+local ok,res = pcall(function() return bit.band(1, 1) end)
+if not ok then 
+	print("not allowed!error:"..res)
+else
+	print(res)
+end
+
